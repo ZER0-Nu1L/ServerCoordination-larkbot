@@ -13,8 +13,9 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-var encryptKey string = "sdnabcdefg"
-
+// Encrypt Key模式
+var ifEncrypt = false
+var encryptKey string = "sdnabcdefg" // TODO: 更改并写成配置文件
 func Decrypt(encrypt string, key string) (string, error) {
 	buf, err := base64.StdEncoding.DecodeString(encrypt)
 	if err != nil {
@@ -45,41 +46,53 @@ func Decrypt(encrypt string, key string) (string, error) {
 		m = len(buf) - 1
 	}
 	return string(buf[n : m+1]), nil
-
 }
 
-type challengeBody struct {
+type challengeBodyInEncrypt struct {
+	// NOTE: 实际上格式更复杂，文档上说得有歧义，有这个模式的需求，请根据https://open.feishu.cn/document/ukTMukTMukTM/uUTNz4SN1MjL1UzM?lang=zh-CN#2eb3504a再更改
 	Encrypt string `json:"encrypt"`
 }
 
-func challengeHandler(c *gin.Context) {
-	challenge := challengeBody{}
-	c.BindJSON(&challenge)
-	encrypt := challenge.Encrypt
+type challengeBody struct {
+	Challenge string `json:"challenge"`
+	Token     string `json:"token"`
+	Type      string `json:"type"`
+}
+
+func challengeInEncryptHandler(c *gin.Context) {
+	challBody := challengeBodyInEncrypt{}
+	c.BindJSON(&challBody)
+	encrypt := challBody.Encrypt
 
 	s, err := Decrypt(encrypt, encryptKey)
 	if err != nil {
 		panic(err)
 	}
-	// DEBUG:
-	// s, err := Decrypt("P37w+VZImNgPEO1RBhJ6RtKl7n6zymIbEG1pReEzghk=", "test key")
-	// if err != nil {
-	// 	panic(err)
-	// }
-	// fmt.Println(s) // hello world
 
 	c.JSON(http.StatusOK, gin.H{
 		"challenge": s,
 	})
 }
+func challengeHandler(c *gin.Context) {
+	challBody := challengeBody{}
+	c.BindJSON(&challBody)
+
+	c.JSON(http.StatusOK, gin.H{
+		"challenge": challBody.Challenge,
+	})
+}
 
 func main() {
 	r := gin.Default()
-	r.POST("/", challengeHandler)
+	if ifEncrypt {
+		r.POST("/", challengeInEncryptHandler)
+	} else {
+		r.POST("/", challengeHandler)
+	}
 	r.GET("/ping", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"message": "pong",
 		})
 	})
-	r.Run() // listen and serve on 0.0.0.0:8080
+	r.Run() // [default]listen and serve on 0.0.0.0:8080
 }
