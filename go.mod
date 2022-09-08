@@ -1,4 +1,4 @@
-module main
+module servercoordination
 
 go 1.14
 
