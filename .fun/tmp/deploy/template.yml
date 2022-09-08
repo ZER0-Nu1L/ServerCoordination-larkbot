@@ -5,6 +5,10 @@ Resources:
     Type: 'Aliyun::Serverless::Service'
     Properties:
       Description: This is FC service
+      Role: 'acs:ram::1315976229694229:role/AliyunFcDefaultRole'
+      LogConfig:
+        Project: aliyun-fc-cn-hangzhou-200354cf-0c75-5f29-bf51-36dbee598257
+        Logstore: function-log
       InternetAccess: true
     ServerCoordination-larkbot:
       Type: 'Aliyun::Serverless::Function'
@@ -15,6 +19,10 @@ Resources:
         MemorySize: 1024
         InstanceConcurrency: 5
         EnvironmentVariables:
+          APP_ID: '"cli_a392b9f8a4b8d00d"'
+          APP_SECRET: '"jSMQG8yJ1G1zef82GAycwf8SGbrjDOVh"'
+          LARK_HOOK: >-
+            "https://open.feishu.cn/open-apis/bot/v2/hook/e5746240-60a1-443c-b8c1-eef212897305"
           LD_LIBRARY_PATH: >-
             /code/.fun/root/usr/local/lib:/code/.fun/root/usr/lib:/code/.fun/root/usr/lib/x86_64-linux-gnu:/code/.fun/root/usr/lib64:/code/.fun/root/lib:/code/.fun/root/lib/x86_64-linux-gnu:/code/.fun/root/python/lib/python2.7/site-packages:/code/.fun/root/python/lib/python3.6/site-packages:/code:/code/lib:/usr/local/lib
           NODE_PATH: '/code/node_modules:/usr/local/lib/node_modules'
