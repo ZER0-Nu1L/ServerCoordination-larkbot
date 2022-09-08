@@ -2,7 +2,8 @@ package handler
 
 import (
 	"fmt"
-	"os"
+
+	"servercoordination/config"
 
 	"github.com/cihub/seelog"
 	"github.com/gin-gonic/gin"
@@ -64,15 +65,11 @@ func ReceiceEventHandler(c *gin.Context) {
 	fmt.Println(msgBody)
 	// util.SendRespToMe(fmt.Sprintf("respond: %v\n", msgBody)) // DEBUG:
 
-	// TODO: 这个Token获取可以在Gin之外，只需要初始化的时候用一次就可以了
-
 	chatID := msgBody.Event.Message.ChatID
 	// chatID := "oc_020b35e61a3bf471ead260a3c586f184" // DEBUG:
 
-	appID := os.Getenv("APP_ID")
-	appSecret := os.Getenv("APP_SECRET")
-	accessToken := GetTenantAccessToken(appID, appSecret)
+	// TODO: add feature
 	content := "{\"text\":\"<at user_id=\\\"dbg369f5\\\">吴昌博</at> test success\"}"
-	seelog.Info(chatID, accessToken, content)
-	Send2Chat(accessToken, chatID, content, "text")
+	seelog.Info(chatID, config.AccessToken, content)
+	Send2Chat(config.AccessToken, chatID, content, "text")
 }

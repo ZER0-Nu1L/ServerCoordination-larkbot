@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	config.Init()
+	config.InitConf()
 
 	r := gin.Default()
 	// if handler.IfEncrypt {
