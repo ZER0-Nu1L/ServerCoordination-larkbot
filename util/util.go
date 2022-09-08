@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"servercoordination/config"
+	"os"
 )
 
 type SendBody struct {
@@ -25,7 +25,8 @@ func SendRespToMe(msg string) {
 	payload, _ := json.Marshal(data)
 
 	client := &http.Client{}
-	req, err := http.NewRequest("POST", config.LarkHook, bytes.NewReader(payload))
+	url := os.Getenv("LARK_HOOK")
+	req, err := http.NewRequest("POST", url, bytes.NewReader(payload))
 
 	if err != nil {
 		fmt.Println(err)

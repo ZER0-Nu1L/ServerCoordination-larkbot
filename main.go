@@ -3,12 +3,15 @@ package main
 import (
 	"net/http"
 
+	"servercoordination/config"
 	"servercoordination/handler"
 
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
+	config.Init()
+
 	r := gin.Default()
 	// if handler.IfEncrypt {
 	// 	r.POST("/", handler.ChallengeInEncryptHandler)

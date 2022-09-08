@@ -1,7 +1,13 @@
 package handler
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"net/http"
+	"os"
+	"servercoordination/config"
 	"servercoordination/util"
 
 	"github.com/gin-gonic/gin"
@@ -62,4 +68,48 @@ func ReceiceEventHandler(c *gin.Context) {
 	c.BindJSON(&msgBody)
 	fmt.Println(msgBody)
 	util.SendRespToMe(fmt.Sprintf("respond: %v\n", msgBody))
+
+	// TODO: 应用
+	GetTenantAccessToken(os.Getenv("APP_ID"), os.Getenv("APP_SECRET"))
+
+}
+
+type TenantAccessTokenBody struct {
+	AppID     string `json:"app_id"`
+	AppSecret string `json:"app_secret"`
+}
+
+func GetTenantAccessToken(addID string, appSecret string) {
+	url := config.BaseURL + "/auth/v3/tenant_access_token/internal"
+	method := "POST"
+
+	data := TenantAccessTokenBody{
+		AppID:     addID,
+		AppSecret: appSecret,
+	}
+	payload, _ := json.Marshal(data)
+
+	client := &http.Client{}
+	req, err := http.NewRequest(method, url, bytes.NewReader(payload))
+
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	req.Header.Add("Content-Type", "text/plain")
+	req.Header.Add("Cookie", "Cookie_2=value")
+
+	res, err := client.Do(req)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	defer res.Body.Close()
+
+	body, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Println(string(body))
 }
